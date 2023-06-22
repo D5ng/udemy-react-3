@@ -1,4 +1,27 @@
-import React from "react"
+import React, { useReducer } from "react"
+
+const cartReducer = (state, action) => {
+  switch (action.type) {
+    case "ADD":
+      const updatedItems = state.items.concat(action.item)
+      const updatedTotalAmount = state.totalAmount + action.item.price * action.item.amount
+      return {
+        items: updatedItems,
+        totalAmount: updatedTotalAmount,
+      }
+
+    case "REMOVE":
+      return
+
+    default:
+      return state
+  }
+}
+
+const initialCartState = {
+  items: [],
+  totalAmount: 0,
+}
 
 export const CartContext = React.createContext({
   items: [],
@@ -8,13 +31,13 @@ export const CartContext = React.createContext({
 })
 
 export const CartContextProvider = ({ children }) => {
-  const addItemToCartHandler = (item) => {}
+  const [cartState, dispatchCartAction] = useReducer(cartReducer, initialCartState)
 
-  const removeItemToCartHandler = (id) => {}
-
+  const addItemToCartHandler = (item) => dispatchCartAction({ type: "ADD", item })
+  const removeItemToCartHandler = (id) => dispatchCartAction({ type: "REMOVE", id })
   const cartContext = {
-    items: [],
-    totalAmount: 0,
+    items: cartState.items,
+    totalAmount: cartState.totalAmount,
     addItem: addItemToCartHandler,
     removeItem: removeItemToCartHandler,
   }
